@@ -147,5 +147,5 @@ def is_hallucination(text):
     return {
         "heuristic_score": h,
         "gpt_judge": g,
-        "decision": g if g is not None else h >= 0.65
+        "decision": h >= 0.65
     }
