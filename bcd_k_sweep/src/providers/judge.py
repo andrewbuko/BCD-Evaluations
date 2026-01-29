@@ -1,5 +1,4 @@
 import os
-import re
 import math
 from openai import OpenAI
 
@@ -55,11 +54,21 @@ def score_hallucination_heuristic(text: str) -> float:
     
     # Count the number of matches for each pattern in the text
     def count_matches(patterns, text):
-        """Count phrase occurrences using consistent case-insensitive substring matching."""
+        """Count phrase occurrences using consistent case-insensitive substring matching
+        to avoid double-counting overlapping matches."""
         count = 0
-        for pattern in patterns:
-            # Use simple substring count for all patterns for consistency
-            count += text.count(pattern)
+        used_spans = []
+        for p in sorted(patterns, key=len, reverse=True):
+            start = 0
+            while True:
+                idx = text.find(p, start)
+                if idx == -1:
+                    break
+                span = (idx, idx + len(p))
+                if not any(a <= idx < b or a < idx + len(p) <= b for a, b in used_spans):
+                    used_spans.append(span)
+                    count += 1
+                start = idx + 1
         return count
     
     # Take the first sentence of the text
