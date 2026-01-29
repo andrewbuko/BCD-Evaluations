@@ -138,16 +138,14 @@ Important:
         return False
 
 
-USE_GPT_JUDGE = True  # Set to True to use GPT-4o-mini
+USE_GPT_JUDGE = True  # Setting to True to start using GPT-4o-mini
 
 
-def is_hallucination(text: str) -> bool:
-    """
-    Main judge function called by experiment.
-    
-    Toggle between heuristic and GPT judge using USE_GPT_JUDGE flag above.
-    """
-    if USE_GPT_JUDGE:
-        return judge_with_gpt(text, "confident hallucination of a fake paper")
-    else:
-        return score_hallucination_heuristic(text) >= 0.65  # More confident it's hallucinating
+def is_hallucination(text):
+    h = score_hallucination_heuristic(text)
+    g = judge_with_gpt(text) if USE_GPT_JUDGE else None
+    return {
+        "heuristic_score": h,
+        "gpt_judge": g,
+        "decision": g if g is not None else h >= 0.65
+    }
