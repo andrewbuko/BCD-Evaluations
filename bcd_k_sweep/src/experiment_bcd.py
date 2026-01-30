@@ -1,17 +1,15 @@
 #!/usr/bin/env python3
 """
-BCD Experiment Runner (API-only, Goodfire-style proxy)
+Measures Behavioral Collapse Distance (BCD) by increasing early-prefix length k (context diff amplification)
 
-Measures Behavioral Collapse Distance (BCD) by either:
-1. PREFIX MODE: Increasing early-prefix length k (context diff amplification)
-2. LDA MODE: Logit Diff Amplification proxy with strength α (Goodfire-style)
 
 Primary signal: deterministic confidence heuristic
-Secondary signal: GPT judge (logged only, not used for BCD)
+Secondary signal: GPT judge for more results (logged only, not used for BCD)
 
 IMPORTANT:
 - This experiment is designed to surface rare behaviors earlier,
-  not to estimate their true prevalence.
+  not to estimate their true prevalence, due to the lack of access
+  to compute resources.
 """
 
 import os
@@ -21,7 +19,7 @@ import time
 from typing import List, Dict, Optional, Union
 from datetime import datetime
 from pathlib import Path
-
+from lda_proxy import generate_with_lda_proxy
 from openai import OpenAI
 from judge import score_hallucination_heuristic, judge_with_gpt
 
